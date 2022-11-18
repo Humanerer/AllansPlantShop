@@ -1,0 +1,56 @@
+<html>
+    <body onload="checkFailure()">
+        <head>
+            <link rel="stylesheet" href="main.css">
+        </head>
+        <title>Login</title>
+        <div class="topnav">
+            <a href="login.html"> login</a>
+            <a href="register.html"> Register</a>
+            <a href="catalog.php"> Catalog</a> 
+            <a href="logout.php"> Logout </a> 
+        </div>
+        <h1> Login </h1>
+        <form method="POST" action="login.php"\>
+            <input type="text" id="username" name="username" placeholder="Username" required/><br><br>
+            <input type="password" id="password" name="password" placeholder="Password" required/><br><br>
+            <input type="hidden" id="hashPass" name="hashPass"/>
+            <input type="hidden" id="des" name="des"/>
+            <input type="submit" value="Submit" onclick="encryptHashedPassword()"/>
+        </form>
+
+        <script src="js/sha256.js"></script>
+        <script src="js/des.js"></script>
+        <script src="js/rsa.js"></script>
+        <script>
+            function encryptHashedPassword(){
+                var pass = document.getElementById("password").value;
+
+                // Random des key based on https://www.programiz.com/javascript/examples/generate-random-strings
+                var des = Math.random().toString(36);
+                // console.log("client: "+des);
+
+                document.getElementById("hashPass").value = javascript_des_encryption(des,SHA256.hash(pass));
+
+                var encrypter = new JSEncrypt();
+                var pubKey = "-----BEGIN PUBLIC KEY-----MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgEIo3I6DTQffmeU+PA90jbrkil44ECrqBESE2RimOF3U3qHD7caELS/Y6Nmt1flYcSSgKqaAMaqkHiTvtv6afV92DTNoGWh7lTaLoK+bxIjejp0+6aroh0TtqPUdt3INm1DnbWueVnYwW4pAr5AH5dsZpZQPOYCytMNQmQboTjpjAgMBAAE=-----END PUBLIC KEY-----";
+                
+                encrypter.setPublicKey(pubKey);
+                
+                var encryptedDes = encrypter.encrypt(des);
+
+                document.getElementById("des").value = encryptedDes;
+                document.cookie = "des="+des;
+            }
+
+            function checkFailure(){
+                var search = new URLSearchParams(window.location.search);
+                if (search.get("login") == "0"){
+                    alert("Invalid username or password");
+                } else if (search.get("login") == "-1"){
+                    alert("You are not logged in, please login and try again");
+                }
+            }
+        </script>
+    </body>
+</html>
